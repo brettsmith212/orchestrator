@@ -124,7 +124,7 @@
 
 ## Test Runner & Patch Arbitration
 
-- [ ] **Step 14: Minimal test runner wrapper**
+- [x] **Step 14: Minimal test runner wrapper**
 
   - **Files**:
     - `internal/core/testrunner.go`
