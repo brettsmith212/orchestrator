@@ -92,7 +92,7 @@
     - `internal/adapter/amp/amp_test.go`
   - **Dependencies**: Step 8
 
-- [ ] **Step 10: OpenAI Codex CLI adapter**
+- [x] **Step 10: OpenAI Codex CLI adapter**
 
   - **Task**: Install hint (`npm -g @openai/codex`), invoke `codex run … --output-format stream-json`.
   - **Files**:
