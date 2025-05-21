@@ -1,0 +1,9 @@
+.PHONY: test lint
+
+test:
+	go test ./...
+
+lint:
+	go vet ./...
+	go fmt ./...
+	@echo "Lint checks passed"

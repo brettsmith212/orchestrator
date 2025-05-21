@@ -14,7 +14,7 @@
   - **Step Dependencies**: none
   - **User Instructions**: `go run ./cmd/orchestrator` should print a greeting.
 
-- [ ] Step 2: Add core dependencies & tooling config
+- [x] Step 2: Add core dependencies & tooling config
 
   - **Task**: Pin Go version, add test deps, set up `make test`.
   - **Description**: Ensures deterministic builds & CI later.
