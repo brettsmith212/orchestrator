@@ -31,6 +31,8 @@ var (
 	prompt     string
 	repoPath   string
 	verbose    bool
+	maxTokens  int
+	timeoutSec int
 )
 
 func init() {
@@ -39,6 +41,8 @@ func init() {
 	flag.StringVar(&prompt, "prompt", "", "Task prompt for the agents")
 	flag.StringVar(&repoPath, "repo", ".", "Path to the git repository")
 	flag.BoolVar(&verbose, "verbose", false, "Enable verbose output")
+	flag.IntVar(&maxTokens, "max-tokens", 10000, "Maximum tokens per agent (0 for unlimited)")
+	flag.IntVar(&timeoutSec, "timeout", 300, "Agent timeout in seconds (0 for config default)")
 }
 
 func main() {
@@ -221,6 +225,66 @@ func runAgents(ctx context.Context, adapters map[string]adapter.Adapter, worktre
 	var wg sync.WaitGroup
 	var mu sync.Mutex
 	patchDetails := make(map[string]*core.PatchDetails)
+	
+	// Set up resource limits
+	limits := core.ResourceLimits{
+		MaxTokens: maxTokens,
+		MaxDuration: time.Duration(timeoutSec) * time.Second,
+	}
+	
+	// If limits aren't specified via flags, use defaults
+	if limits.MaxTokens == 0 {
+		limits.MaxTokens = core.DefaultLimits.MaxTokens
+	}
+	
+	if limits.MaxDuration == 0 {
+		limits.MaxDuration = core.DefaultLimits.MaxDuration
+	}
+	
+	// Create watchdog
+	watchdog := core.NewWatchdog(limits)
+	
+	// Create channels for watchdog communications
+	warningCh := make(chan *protocol.Event, len(adapters))
+	terminateCh := make(chan string, len(adapters))
+	
+	// Start watchdog in background
+	watchdogCtx, watchdogCancel := context.WithCancel(ctx)
+	defer watchdogCancel()
+	go watchdog.RunPeriodicCheck(watchdogCtx, 5*time.Second, warningCh, terminateCh)
+	
+	// Handle watchdog warnings
+	go func() {
+		for {
+			select {
+			case warning, ok := <-warningCh:
+				if !ok {
+					return // Channel closed
+				}
+				
+				// Log the warning
+				if verbose {
+					fmt.Printf("Watchdog warning: %s\n", warning.Payload)
+				}
+				
+			case agentID, ok := <-terminateCh:
+				if !ok {
+					return // Channel closed
+				}
+				
+				// Log the termination
+				log.Printf("Terminating agent %s due to resource limit exceeded\n", agentID)
+				
+				// Get the adapter and shut it down
+				if adapter, exists := adapters[agentID]; exists {
+					_ = adapter.Shutdown() // Ignore error, we're terminating anyway
+				}
+				
+			case <-watchdogCtx.Done():
+				return // Context cancelled
+			}
+		}
+	}()
 
 	for agentID, agentAdapter := range adapters {
 		wg.Add(1)
@@ -234,9 +298,13 @@ func runAgents(ctx context.Context, adapters map[string]adapter.Adapter, worktre
 				return
 			}
 
+			// Start monitoring this agent
+			watchdog.MonitorAgent(id)
+			
 			// Start the agent
 			if verbose {
-				fmt.Printf("Starting agent %s in worktree %s\n", id, worktreePath)
+				fmt.Printf("Starting agent %s in worktree %s (limits: %d tokens, %v)\n", 
+					id, worktreePath, limits.MaxTokens, limits.MaxDuration)
 			}
 
 			eventCh, err := adpt.Start(ctx, worktreePath, prompt)
@@ -245,8 +313,8 @@ func runAgents(ctx context.Context, adapters map[string]adapter.Adapter, worktre
 				return
 			}
 
-			// Collect events
-			events := collectEvents(ctx, id, eventCh)
+			// Process and collect events with watchdog tracking
+			events := collectEventsWithWatchdog(ctx, id, eventCh, watchdog)
 
 			// Cleanup
 			if err := adpt.Shutdown(); err != nil {
@@ -269,9 +337,19 @@ func runAgents(ctx context.Context, adapters map[string]adapter.Adapter, worktre
 			}
 			mu.Unlock()
 
+			// Stop monitoring this agent
+			watchdog.StopMonitoring(id)
+			
 			if verbose {
-				fmt.Printf("Agent %s completed with %d events and %d bytes of diff\n", 
-					id, len(events), len(diff))
+				// Get usage statistics
+				usage := watchdog.GetUsage()
+				if counter, exists := usage[id]; exists {
+					fmt.Printf("Agent %s completed with %d events, %d tokens used, in %v\n", 
+						id, len(events), counter.TotalTokens(), counter.Duration().Round(time.Second))
+				} else {
+					fmt.Printf("Agent %s completed with %d events and %d bytes of diff\n", 
+						id, len(events), len(diff))
+				}
 			}
 		}(agentID, agentAdapter)
 	}
@@ -296,6 +374,38 @@ func collectEvents(ctx context.Context, agentID string, eventCh <-chan *protocol
 			// Only process valid events
 			if event != nil {
 				events = append(events, event)
+				if verbose {
+					fmt.Printf("Agent %s: Received %s event\n", agentID, event.Type)
+				}
+			}
+
+		case <-ctx.Done():
+			// Context cancelled, return what we have
+			return events
+		}
+	}
+}
+
+// collectEventsWithWatchdog reads events from the channel and tracks them with the watchdog
+func collectEventsWithWatchdog(ctx context.Context, agentID string, eventCh <-chan *protocol.Event, watchdog *core.Watchdog) []*protocol.Event {
+	var events []*protocol.Event
+
+	for {
+		select {
+		case event, ok := <-eventCh:
+			if !ok {
+				// Channel closed, all events received
+				return events
+			}
+			
+			// Only process valid events
+			if event != nil {
+				// Track the event with the watchdog
+				watchdog.TrackEvent(event)
+				
+				// Store the event
+				events = append(events, event)
+				
 				if verbose {
 					fmt.Printf("Agent %s: Received %s event\n", agentID, event.Type)
 				}

@@ -146,7 +146,7 @@
     - `cmd/orchestrator/main_test.go`
   - **Dependencies**: Steps 7-15
 
-- [ ] **Step 17: Cost & timeout watchdog**
+- [x] **Step 17: Cost & timeout watchdog**
   - **Task**: Parse token counts from agent events; enforce caps.
   - **Files**:
     - `internal/core/watchdog.go`
