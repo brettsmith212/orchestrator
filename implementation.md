@@ -100,7 +100,7 @@
     - `internal/adapter/codex/codex_test.go`
   - **Dependencies**: Step 8
 
-- [ ] **Step 11: Claude Code CLI adapter**
+- [x] **Step 11: Claude Code CLI adapter**
   - **Task**: Install hint (`npm install -g @anthropic-ai/claude-code`) Invoke `claude-code … --output-format stream-json`, parse events, track token usage.
   - **Files**:
     - `internal/adapter/claude/claude.go`
@@ -177,19 +177,6 @@
     - `cmd/orchestrator/tty_guard_test.go`
   - **Dependencies**: Step 19
 
-## Packaging & Continuous Delivery
-
-- [ ] **Step 21: GoReleaser config**
-
-  - **Files**:
-    - `.goreleaser.yaml`
-  - **Dependencies**: Step 16
-
-- [ ] **Step 22: GitHub Actions CI matrix**
-  - **Files**:
-    - `.github/workflows/ci.yml`
-  - **Dependencies**: Steps 2, 21
-
 ## Living Documentation & Examples
 
 - [ ] **Step 23: Populate `AGENTS.md` install matrix**
@@ -209,18 +196,3 @@
     - `examples/demo.sh`
     - `README.md`
   - **Dependencies**: Steps 16-24
-
-## Hardening & Edge-Cases
-
-- [ ] **Step 26: Enterprise agent whitelist flag**
-
-  - **Files**:
-    - `internal/core/whitelist.go`
-    - `internal/core/whitelist_test.go`
-  - **Dependencies**: Steps 3, 16
-
-- [ ] **Step 27: Version compatibility tests**
-  - **Files**:
-    - `.github/workflows/compat.yml`
-    - `internal/protocol/compat_test.go`
-  - **Dependencies**: Step 24
