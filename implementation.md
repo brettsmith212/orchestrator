@@ -24,7 +24,7 @@
   - **Dependencies**: Step 1
   - **User Instructions**: `make test` passes (no tests yet).
 
-- [ ] Step 3: Establish configuration struct & default file
+- [x] Step 3: Establish configuration struct & default file
 
   - **Task**: Define `Config` (YAML) with basic paths and agent list.
   - **Description**: Central place for flags & future env overrides.

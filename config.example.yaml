@@ -1,0 +1,31 @@
+# Orchestrator Example Configuration
+
+# Directory for creating temporary git worktrees
+working_dir: "/tmp/orchestrator-worktrees"
+
+# Command to run tests
+test_command: "go test ./..."
+
+# Maximum time to wait for agent responses (in seconds)
+timeout_seconds: 300
+
+# List of AI coding agents to use
+agents:
+  - id: "codex"
+    type: "http"
+    config:
+      api_url: "https://api.openai.com/v1/completions"
+      model: "gpt-3.5-turbo"
+      max_tokens: 1000
+
+  - id: "amp"
+    type: "cli"
+    config:
+      command: "amp"
+      args: ["-w", ".", "--json-output"]
+
+  - id: "other-agent"
+    type: "cli"
+    config:
+      command: "/path/to/agent"
+      args: ["--arg1", "--arg2"]
