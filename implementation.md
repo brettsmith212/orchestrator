@@ -46,7 +46,7 @@
 
 ## Core Interfaces
 
-- [ ] Step 5: Define `Event` types & ND-JSON codec
+- [x] Step 5: Define `Event` types & ND-JSON codec
 
   - **Task**: Create `protocol.Event` struct + `Marshal/Unmarshal`.
   - **Description**: Contracts every component relies on.
