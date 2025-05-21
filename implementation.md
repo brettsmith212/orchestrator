@@ -109,7 +109,7 @@
 
 ## Git Work-Tree & Diff Utilities
 
-- [ ] **Step 12: Git work-tree manager**
+- [x] **Step 12: Git work-tree manager**
 
   - **Files**:
     - `internal/gitutil/worktree.go`
