@@ -195,3 +195,15 @@ func randomString(length int) string {
 
 	return string(b)
 }
+
+// RunGitCommand creates an exec.Cmd to run a git command in the given directory
+func RunGitCommand(dir string, args ...string) *exec.Cmd {
+	// Prepend "git" to the args
+	gitArgs := append([]string{"git"}, args...)
+	
+	// Create the command
+	cmd := exec.Command(gitArgs[0], gitArgs[1:]...)
+	cmd.Dir = dir
+	
+	return cmd
+}

@@ -43,7 +43,7 @@ agents:
   - id: "claude"
     type: "cli"
     config:
-      command: "claude-code"
+      command: "claude"
       args: ["--output-format", "stream-json"]
 ```
 

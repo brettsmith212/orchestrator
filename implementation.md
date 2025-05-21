@@ -131,7 +131,7 @@
     - `internal/core/testrunner_test.go`
   - **Dependencies**: Step 12
 
-- [ ] **Step 15: Patch selector logic**
+- [x] **Step 15: Patch selector logic**
   - **Files**:
     - `internal/core/arbitrator.go`
     - `internal/core/arbitrator_test.go`
