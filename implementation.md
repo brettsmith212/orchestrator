@@ -75,7 +75,7 @@
 
 ## Adapters – CLI-only
 
-- [ ] **Step 8: Generic `cliAdapter` implementation**
+- [x] **Step 8: Generic `cliAdapter` implementation**
 
   - **Task**: Exec external binary, stream `stdout` lines, map to events.
   - **Description**: Single code-path for all agents.
@@ -84,7 +84,7 @@
     - `internal/adapter/cli/cli_test.go`
   - **Dependencies**: Step 6
 
-- [ ] **Step 9: Sourcegraph Amp CLI adapter**
+- [x] **Step 9: Sourcegraph Amp CLI adapter**
 
   - **Task**: Install hint (`npm install -g @sourcegraph/amp`), Config preset (binary name `amp`, args), integration test with fake script.
   - **Files**:
