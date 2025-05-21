@@ -35,7 +35,7 @@
   - **Dependencies**: Step 2
   - **User Instructions**: `go test ./...` should still pass.
 
-- [ ] Step 4: Stub living documentation
+- [x] Step 4: Stub living documentation
   - **Task**: Add placeholders so docs stay version-controlled.
   - **Description**: Early visibility drives doc discipline.
   - **Files**:
