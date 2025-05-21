@@ -116,7 +116,7 @@
     - `internal/gitutil/worktree_test.go`
   - **Dependencies**: Step 3
 
-- [ ] **Step 13: Unified diff normaliser**
+- [x] **Step 13: Unified diff normaliser**
   - **Files**:
     - `internal/gitutil/diff.go`
     - `internal/gitutil/diff_test.go`
