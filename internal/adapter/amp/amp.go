@@ -2,6 +2,7 @@ package amp
 
 import (
 	"fmt"
+	"os/exec"
 
 	"github.com/brettsmith212/orchestrator/internal/adapter"
 	"github.com/brettsmith212/orchestrator/internal/adapter/cli"
@@ -28,8 +29,22 @@ func New(id string, config map[string]interface{}) (adapter.Adapter, error) {
 
 	// Determine command name
 	command := "amp"
+
+	// Use specified binary path if provided
 	if ampConfig.BinaryPath != "" {
 		command = ampConfig.BinaryPath
+	} else {
+		// Check if amp exists using `which amp`
+		whichCmd := exec.Command("which", "amp")
+		output, err := whichCmd.Output()
+		if err != nil {
+			return nil, fmt.Errorf("amp binary not found. Please install it using 'npm install -g @sourcegraph/amp' or specify binary_path in your configuration")
+		}
+		
+		// Trim newline from output and use the full path
+		if len(output) > 0 {
+			command = string(output[:len(output)-1])
+		}
 	}
 
 	// Combine default arguments with custom arguments

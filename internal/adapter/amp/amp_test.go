@@ -10,15 +10,25 @@ import (
 )
 
 func TestAmpAdapter(t *testing.T) {
+	// Skip when running in CI or with -short flag
+	if testing.Short() {
+		t.Skip("Skipping test that requires amp binary")
+	}
+
 	// Test creating adapter with default configuration
 	ampAdapter, err := New("amp-agent", map[string]interface{}{})
+	
+	// If amp is not installed, this test will fail but that's expected
+	if err != nil && err.Error() == "amp binary not found. Please install it using 'npm install -g @sourcegraph/amp' or specify binary_path in your configuration" {
+		t.Skip("Skipping test because amp binary is not installed")
+	}
+
 	require.NoError(t, err)
 
 	// Verify it's actually a CLI adapter under the hood
 	_, ok := ampAdapter.(*cli.Adapter)
 	assert.True(t, ok)
 
-	// Check it has proper ID
 	// Call Shutdown to avoid resource leaks
 	defer ampAdapter.Shutdown()
 }
