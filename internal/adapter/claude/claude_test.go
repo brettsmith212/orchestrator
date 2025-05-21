@@ -31,7 +31,7 @@ func TestClaudeFactory(t *testing.T) {
 		ID:   "claude-test",
 		Type: "cli",
 		AdapterConfig: map[string]interface{}{
-			"binary_path": "/usr/local/bin/claude-code",
+			"binary_path": "/usr/local/bin/claude",
 			"model":      "claude-3",
 			"max_tokens": float64(2000),
 			"args": []interface{}{
@@ -80,9 +80,9 @@ func TestParseConfig(t *testing.T) {
 		{
 			name: "custom binary path",
 			config: map[string]interface{}{
-				"binary_path": "/custom/path/to/claude-code",
+				"binary_path": "/custom/path/to/claude",
 			},
-			expectedPath:   "/custom/path/to/claude-code",
+			expectedPath:   "/custom/path/to/claude",
 			expectedModel:  "",
 			expectedTokens: 0,
 			expectedArgs:   []string{},
@@ -132,14 +132,14 @@ func TestParseConfig(t *testing.T) {
 		{
 			name: "full config",
 			config: map[string]interface{}{
-				"binary_path": "/path/to/claude-code",
+				"binary_path": "/path/to/claude",
 				"model":      "claude-3-sonnet",
 				"max_tokens": float64(4000),
 				"args": []interface{}{
 					"-w", ".", "--verbose",
 				},
 			},
-			expectedPath:   "/path/to/claude-code",
+			expectedPath:   "/path/to/claude",
 			expectedModel:  "claude-3-sonnet",
 			expectedTokens: 4000,
 			expectedArgs:   []string{"-w", ".", "--verbose"},

@@ -101,7 +101,7 @@
   - **Dependencies**: Step 8
 
 - [x] **Step 11: Claude Code CLI adapter**
-  - **Task**: Install hint (`npm install -g @anthropic-ai/claude-code`) Invoke `claude-code … --output-format stream-json`, parse events, track token usage.
+  - **Task**: Install hint (`npm install -g @anthropic-ai/claude-code`) Invoke `claude … --output-format stream-json`, parse events, track token usage.
   - **Files**:
     - `internal/adapter/claude/claude.go`
     - `internal/adapter/claude/claude_test.go`
@@ -139,7 +139,7 @@
 
 ## Orchestrator Command & Watchdogs
 
-- [ ] **Step 16: Wire up `cmd/orchestrator run` baseline**
+- [x] **Step 16: Wire up `cmd/orchestrator run` baseline**
 
   - **Files**:
     - `cmd/orchestrator/main.go` (replace stub)

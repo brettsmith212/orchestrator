@@ -14,7 +14,7 @@ var defaultArgs = []string{
 
 // Config holds Claude-specific configuration
 type Config struct {
-	// BinaryPath is the path to the Claude executable (defaults to "claude-code")
+	// BinaryPath is the path to the Claude executable (defaults to "claude")
 	BinaryPath string `yaml:"binary_path"`
 
 	// Model specifies which model to use
@@ -33,7 +33,7 @@ func New(id string, config map[string]interface{}) (adapter.Adapter, error) {
 	claudeConfig := parseConfig(config)
 
 	// Determine command name
-	command := "claude-code"
+	command := "claude"
 	if claudeConfig.BinaryPath != "" {
 		command = claudeConfig.BinaryPath
 	}
