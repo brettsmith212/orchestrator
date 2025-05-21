@@ -56,7 +56,7 @@
   - **Dependencies**: Step 3
   - **User Instructions**: Tests ensure round-trip JSON fidelity.
 
-- [ ] Step 6: Draft `Adapter` interface
+- [x] Step 6: Draft `Adapter` interface
 
   - **Task**: Interface with `Start(ctx, worktree, prompt) (<-chan protocol.Event, error)` & `Shutdown()`.
   - **Description**: Provides compile target for all agents.
