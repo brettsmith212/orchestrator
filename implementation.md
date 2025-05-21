@@ -65,7 +65,7 @@
     - `internal/adapter/adapter_test.go` (uses tiny fake)
   - **Dependencies**: Step 5
 
-- [ ] Step 7: Implement adapter registry
+- [x] Step 7: Implement adapter registry
   - **Task**: Map agent IDs → factory funcs; load via config.
   - **Description**: Decouples Orchestrator from concrete adapters.
   - **Files**:
@@ -73,180 +73,154 @@
     - `internal/adapter/registry_test.go`
   - **Dependencies**: Step 6
 
-## Adapters – HTTP & CLI
+## Adapters – CLI-only
 
-- [ ] Step 8: Skeleton `httpAdapter` for OpenAI Codex
+- [ ] **Step 8: Generic `cliAdapter` implementation**
 
-  - **Task**: Scaffolding with mocked API call & fake response.
-  - **Description**: Exercises registry and event flow early.
-  - **Files**:
-    - `internal/adapter/codex/http.go`
-    - `internal/adapter/codex/http_test.go`
-  - **Dependencies**: Steps 6-7
-  - **User Instructions**: Unit test uses httptest server; no real keys.
-
-- [ ] Step 9: Generic `cliAdapter` implementation
-
-  - **Task**: Run external binary, stream JSON lines to events.
-  - **Description**: One codepath for Amp, Aider, etc.
+  - **Task**: Exec external binary, stream `stdout` lines, map to events.
+  - **Description**: Single code-path for all agents.
   - **Files**:
     - `internal/adapter/cli/cli.go`
     - `internal/adapter/cli/cli_test.go`
   - **Dependencies**: Step 6
 
-- [ ] Step 10: Sourcegraph Amp adapter via `cliAdapter`
-  - **Task**: Config preset (install hint, args) + integration test w/ fake script.
-  - **Description**: Validates cliAdapter flexibility.
+- [ ] **Step 9: Sourcegraph Amp CLI adapter**
+
+  - **Task**: Install hint (`npm install -g @sourcegraph/amp`), Config preset (binary name `amp`, args), integration test with fake script.
   - **Files**:
     - `internal/adapter/amp/amp.go`
     - `internal/adapter/amp/amp_test.go`
-  - **Dependencies**: Step 9
+  - **Dependencies**: Step 8
+
+- [ ] **Step 10: OpenAI Codex CLI adapter**
+
+  - **Task**: Install hint (`npm -g @openai/codex`), invoke `codex run … --output-format stream-json`.
+  - **Files**:
+    - `internal/adapter/codex/codex.go`
+    - `internal/adapter/codex/codex_test.go`
+  - **Dependencies**: Step 8
+
+- [ ] **Step 11: Claude Code CLI adapter**
+  - **Task**: Install hint (`npm install -g @anthropic-ai/claude-code`) Invoke `claude-code … --output-format stream-json`, parse events, track token usage.
+  - **Files**:
+    - `internal/adapter/claude/claude.go`
+    - `internal/adapter/claude/claude_test.go`
+  - **Dependencies**: Step 8
 
 ## Git Work-Tree & Diff Utilities
 
-- [ ] Step 11: Git work-tree manager
+- [ ] **Step 12: Git work-tree manager**
 
-  - **Task**: Create temp worktree, checkout current HEAD, cleanup.
-  - **Description**: Isolates each agent’s patch.
   - **Files**:
     - `internal/gitutil/worktree.go`
     - `internal/gitutil/worktree_test.go`
   - **Dependencies**: Step 3
 
-- [ ] Step 12: Unified diff normaliser
-  - **Task**: Normalise `git diff` output for comparison/scoring.
-  - **Description**: Enables objective patch ranking.
+- [ ] **Step 13: Unified diff normaliser**
   - **Files**:
     - `internal/gitutil/diff.go`
     - `internal/gitutil/diff_test.go`
-  - **Dependencies**: Step 11
+  - **Dependencies**: Step 12
 
 ## Test Runner & Patch Arbitration
 
-- [ ] Step 13: Minimal test runner wrapper
+- [ ] **Step 14: Minimal test runner wrapper**
 
-  - **Task**: Run project’s tests inside a given worktree, capture JSON summary.
-  - **Description**: Determines “did patch fix failing tests?”
   - **Files**:
     - `internal/core/testrunner.go`
     - `internal/core/testrunner_test.go`
-  - **Dependencies**: Step 11
+  - **Dependencies**: Step 12
 
-- [ ] Step 14: Patch selector logic
-  - **Task**: Compare events + test results, select best diff.
-  - **Description**: Core “arbitrator” responsibility.
+- [ ] **Step 15: Patch selector logic**
   - **Files**:
     - `internal/core/arbitrator.go`
     - `internal/core/arbitrator_test.go`
-  - **Dependencies**: Steps 5, 12-13
+  - **Dependencies**: Steps 5, 13-14
 
 ## Orchestrator Command & Watchdogs
 
-- [ ] Step 15: Wire up `cmd/orchestrator run` baseline
+- [ ] **Step 16: Wire up `cmd/orchestrator run` baseline**
 
-  - **Task**: Parse flags, load config, instantiate registry, fan-out prompt, print ND-JSON.
-  - **Description**: End-to-end baseline proving earlier layers work.
   - **Files**:
     - `cmd/orchestrator/main.go` (replace stub)
-    - `cmd/orchestrator/main_test.go` (uses exec.Command test)
-  - **Dependencies**: Steps 7-14
+    - `cmd/orchestrator/main_test.go`
+  - **Dependencies**: Steps 7-15
 
-- [ ] Step 16: Cost & timeout watchdog
-  - **Task**: Track tokens/time, cancel overruns, emit warning events.
-  - **Description**: Prevent runaway spend; aligns with spec.
+- [ ] **Step 17: Cost & timeout watchdog**
+  - **Task**: Parse token counts from agent events; enforce caps.
   - **Files**:
     - `internal/core/watchdog.go`
     - `internal/core/watchdog_test.go`
-  - **Dependencies**: Step 15
+  - **Dependencies**: Step 16
 
 ## Event Stream & Optional TUI
 
-- [ ] Step 17: ND-JSON streamer utility
+- [ ] **Step 18: ND-JSON streamer utility**
 
-  - **Task**: Multiplex adapter event channels → stdout or pipe.
-  - **Description**: Guarantees consistent format for CLI & TUI.
   - **Files**:
     - `internal/core/streamer.go`
     - `internal/core/streamer_test.go`
-  - **Dependencies**: Step 5, 15
+  - **Dependencies**: Steps 5, 16
 
-- [ ] Step 18: Bubble Tea TUI MVP
+- [ ] **Step 19: Bubble Tea TUI MVP**
 
-  - **Task**: Render live list of agents & status; flag `--ui`.
-  - **Description**: Optional richer UX per spec.
   - **Files**:
     - `internal/ui/model.go`
     - `internal/ui/view.go`
     - `internal/ui/update.go`
     - `internal/ui/ui_test.go`
-  - **Dependencies**: Step 17
+  - **Dependencies**: Step 18
 
-- [ ] Step 19: Non-TTY fallback guard
-  - **Task**: Detect `$TERM=dumb` or piped stdout, disable TUI.
-  - **Description**: Mitigates risk #4.
+- [ ] **Step 20: Non-TTY fallback guard**
   - **Files**:
     - `cmd/orchestrator/tty_guard.go`
     - `cmd/orchestrator/tty_guard_test.go`
-  - **Dependencies**: Step 18
+  - **Dependencies**: Step 19
 
 ## Packaging & Continuous Delivery
 
-- [ ] Step 20: GoReleaser config
+- [ ] **Step 21: GoReleaser config**
 
-  - **Task**: `.goreleaser.yaml` with six OS/arch targets, signing.
-  - **Description**: Cross-platform binaries per risk table.
   - **Files**:
     - `.goreleaser.yaml`
-  - **Dependencies**: Step 15
+  - **Dependencies**: Step 16
 
-- [ ] Step 21: GitHub Actions CI matrix
-  - **Task**: `ci.yml` to lint, test, run GoReleaser on tags.
-  - **Description**: Automated builds & checks.
+- [ ] **Step 22: GitHub Actions CI matrix**
   - **Files**:
     - `.github/workflows/ci.yml`
-  - **Dependencies**: Steps 2, 20
+  - **Dependencies**: Steps 2, 21
 
 ## Living Documentation & Examples
 
-- [ ] Step 22: Populate `AGENTS.md` install matrix
+- [ ] **Step 23: Populate `AGENTS.md` install matrix**
 
-  - **Task**: Fill real commands, version pins, exit codes.
-  - **Description**: Guides users & CI.
   - **Files**:
     - `AGENTS.md`
-  - **Dependencies**: Step 8-10
+  - **Dependencies**: Steps 9-11
 
-- [ ] Step 23: Draft `orchestrator-protocol.md` v1
+- [ ] **Step 24: Draft `orchestrator-protocol.md` v1**
 
-  - **Task**: Document event schemas, versioning rules.
-  - **Description**: Locks contract before external integrations.
   - **Files**:
     - `orchestrator-protocol.md`
-  - **Dependencies**: Step 5, 17
+  - **Dependencies**: Steps 5, 18
 
-- [ ] Step 24: End-to-end demo script & README update
-  - **Task**: Tutorial using toy repo, includes GIF of TUI.
-  - **Description**: Completes Milestone-1 exit criteria.
+- [ ] **Step 25: End-to-end demo script & README update**
   - **Files**:
     - `examples/demo.sh`
-    - `README.md` (expanded)
-  - **Dependencies**: Steps 15-23
+    - `README.md`
+  - **Dependencies**: Steps 16-24
 
 ## Hardening & Edge-Cases
 
-- [ ] Step 25: Enterprise agent whitelist feature flag
+- [ ] **Step 26: Enterprise agent whitelist flag**
 
-  - **Task**: `--allowed-agents` cli flag + config.
-  - **Description**: Satisfies licensing mitigation.
   - **Files**:
     - `internal/core/whitelist.go`
     - `internal/core/whitelist_test.go`
-  - **Dependencies**: Steps 3, 15
+  - **Dependencies**: Steps 3, 16
 
-- [ ] Step 26: Version compatibility tests
-  - **Task**: Add CI job comparing latest protocol vs frozen files.
-  - **Description**: Enforces risk #5.
+- [ ] **Step 27: Version compatibility tests**
   - **Files**:
     - `.github/workflows/compat.yml`
     - `internal/protocol/compat_test.go`
-  - **Dependencies**: Step 23
+  - **Dependencies**: Step 24

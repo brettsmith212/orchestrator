@@ -4,13 +4,13 @@ This document lists the AI coding agents that are compatible with the orchestrat
 
 ## Installation Instructions
 
-| Agent | Installation Command | Version | Notes |
-|-------|---------------------|---------|-------|
-| Amp   | `npm install -g @sourcegraph/cody-cli` | | Sourcegraph Cody CLI |
-| OpenAI | N/A - HTTP API | | Requires API key |
-| aider | `pip install aider-chat` | | |
-| | | | |
-| | | | |
+| Agent       | Installation Command                       | Version | Notes                     |
+| ----------- | ------------------------------------------ | ------- | ------------------------- |
+| Amp         | `npm install -g @sourcegraph/amp`          |         | Sourcegraph Cody CLI      |
+| Codex       | `npm install -g @openai/codex`             |         | OpenAI Codex CLI          |
+| Claude Code | `npm install -g @anthropic-ai/claude-code` |         | Anthropic Claude Code CLI |
+|             |                                            |         |                           |
+|             |                                            |         |                           |
 
 ## Configuration Guide
 
@@ -25,22 +25,32 @@ agents:
       args: ["-w", ".", "--json-output"]
 ```
 
-### OpenAI API
+### OpenAI Codex
 
 ```yaml
 agents:
-  - id: "openai"
-    type: "http"
+  - id: "codex"
+    type: "cli"
     config:
-      api_url: "https://api.openai.com/v1/chat/completions"
-      model: "gpt-4"
-      max_tokens: 2000
+      command: "codex"
+      args: ["run", "--output-format", "stream-json"]
+```
+
+### Claude Code
+
+```yaml
+agents:
+  - id: "claude"
+    type: "cli"
+    config:
+      command: "claude-code"
+      args: ["--output-format", "stream-json"]
 ```
 
 ## Exit Codes
 
-| Agent | Success | Error | Timeout |
-|-------|---------|-------|--------|
-| Amp   | 0       | 1     | 124    |
-| OpenAI | N/A     | N/A   | N/A    |
-| aider | 0       | 1     | 124    |
+| Agent       | Success | Error | Timeout |
+| ----------- | ------- | ----- | ------- |
+| Amp         | 0       | 1     | 124     |
+| Codex       | 0       | 1     | 124     |
+| Claude Code | 0       | 1     | 124     |
